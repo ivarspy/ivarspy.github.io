@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="full-height">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="//cdn.bootcss.com/bulma/0.4.1/css/bulma.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  
+  <title>tableView的性能优化 | ivarspy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="缓存行高 可以使用 NSCache | NSDictionary来缓存行高   不要动态创建子视图 使用shadowpath来设置阴影 所有的子视图都预先创建 如果不需要显示可以设置 hidden 所有的子视图都应该添加到 contentView 上 所有的子视图都必须指定背景颜色 所有的颜色都不要使用 alpha cell 栅格化异步绘制// 栅格化layer.shouldRasterize">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tableView的性能优化">
+<meta property="og:url" content="http://yoursite.com/2017/08/06/tableView的性能优化/index.html">
+<meta property="og:site_name" content="ivarspy">
+<meta property="og:description" content="缓存行高 可以使用 NSCache | NSDictionary来缓存行高   不要动态创建子视图 使用shadowpath来设置阴影 所有的子视图都预先创建 如果不需要显示可以设置 hidden 所有的子视图都应该添加到 contentView 上 所有的子视图都必须指定背景颜色 所有的颜色都不要使用 alpha cell 栅格化异步绘制// 栅格化layer.shouldRasterize">
+<meta property="og:updated_time" content="2017-08-06T14:05:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tableView的性能优化">
+<meta name="twitter:description" content="缓存行高 可以使用 NSCache | NSDictionary来缓存行高   不要动态创建子视图 使用shadowpath来设置阴影 所有的子视图都预先创建 如果不需要显示可以设置 hidden 所有的子视图都应该添加到 contentView 上 所有的子视图都必须指定背景颜色 所有的颜色都不要使用 alpha cell 栅格化异步绘制// 栅格化layer.shouldRasterize">
+  
+    <link rel="alternate" href="/atom.xml" title="ivarspy" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/common.css">
+<link rel="stylesheet" href="/css/nav.css">
+<link rel="stylesheet" href="/css/layout.css">
+  
+
+</head>
+
+<body>
+  <header id="navbar" class="overflow-hidden">
+  <div class="container">
+    <nav class="nav">
+         <div class="nav-left">
+            <a href="/" class="nav-item" style="font-size: 20px;">
+              <span class="logo">ivarspy</span>'s Blog
+            </a>
+         </div>
+        <div class="nav-center is-hidden position-relative" id="search_container">
+            <div class="nav-item full-width full-height">
+                <i class="fa fa-search has-padding" aria-hidden="true"></i>
+                <input type="text" id="search_input" class="search-input full-height full-width" placeholder="Search post" autofocus>
+                <i id="close_search" class="fa fa-times" aria-hidden="true"></i>
+            </div>
+            <div id="search_result"></div>
+        </div>
+        <div class="nav-right nav-menu">
+            <a class="nav-item" id="search">
+                <i class="fa fa-search" aria-hidden="true"></i>
+            </a>
+            
+            <a class="nav-item" href="/">
+                Home
+            </a>
+            
+            <a class="nav-item" href="/works">
+                My Works
+            </a>
+            
+            <a class="nav-item" href="/about">
+                About
+            </a>
+            
+        </div>
+        <span class="nav-toggle" id="navMenuDropdown">
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+        <div class="navbar-menu position-absolute full-width content-box is-hidden-desktop is-flex flex-column center" style="top: 100%;">
+            
+            <a class="nav-item flex-1" href="/">
+                Home
+            </a>
+            
+            <a class="nav-item flex-1" href="/works">
+                My Works
+            </a>
+            
+            <a class="nav-item flex-1" href="/about">
+                About
+            </a>
+            
+        </div>
+    </nav>
+  </div>
+</header>
+
+  <div id="main-wrap" class="position-relative" style="margin-top: 55px;">
+      <div class="main-inner-content">
+          <!--博文页面-->
+
+<style>
+    .header-box {
+        height: 370px;
+        filter: blur(10px);
+        background-size: cover;
+        background-color: lightsteelblue;
+    }
+
+    .post-box {
+        padding: 15px;
+        padding-top: 60px;
+        min-height: 80vh;
+        margin-top: -200px;
+        border-radius: 4px;
+        background-color: rgba(255,255,255,.8);
+    }
+
+    .post-avatar {
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+    }
+
+    .flow-chart {
+        text-align: center;
+    }
+
+    img[alt="post-cover"] {
+        display: none;
+    }
+</style>
+<header>
+    <div id="header_box" class="header-box"></div>
+</header>
+<section>
+    <div class="container post-box">
+        <div class="content post-title is-flex center flex-column" style="margin-bottom: 70px; overflow: auto;">
+            <h1 class="has-text-centered" style="padding-bottom: 10px; border-bottom: 3px solid #fff">
+                <strong>tableView的性能优化</strong>
+            </h1>
+            
+            <div class="is-flex align-center">
+                <img class="post-avatar" src="http://imglf.nosdn.127.net/img/SWhwMEtkbCtuT2tyTERJU1JOU2E5VWUxK2VIaHdJTUZ5MXZyYThmSXU3WlJmc09zdld3Qk9nPT0.jpeg?imageView&thumbnail=500x0&quality=96&stripmeta=0&type=jpg">
+                <span style="padding:0 10px;"> <span class="sub-title">By</span> ivarspy</span>
+                <span class="post-date sub-title">at: 2017-08-06</span>
+            </div>
+            
+                <div>
+                    
+                </div>
+            
+        </div>
+        <div class="content" style="overflow: auto">
+            <ul>
+<li><strong>缓存行高</strong><ol>
+<li>可以使用 <code>NSCache | NSDictionary</code>来缓存行高</li>
+</ol>
+</li>
+<li>不要动态创建子视图</li>
+<li>使用shadowpath来设置阴影</li>
+<li>所有的子视图都预先创建</li>
+<li>如果不需要显示可以设置 hidden</li>
+<li>所有的子视图都应该添加到 contentView 上</li>
+<li>所有的子视图都必须指定背景颜色</li>
+<li>所有的颜色都不要使用 alpha</li>
+<li><strong>cell 栅格化</strong><br>异步绘制<br>// 栅格化<br><code>layer.shouldRasterize = true</code><br><code>layer.rasterizationScale = UIScreen.mainScreen().scale</code><br>// 异步绘制<br><code>layer.drawsAsynchronously = true</code></li>
+</ul>
+<hr>
+<h3 id="补充-tableView的一些小技巧"><a href="#补充-tableView的一些小技巧" class="headerlink" title="补充: tableView的一些小技巧"></a>补充: tableView的一些小技巧</h3><ul>
+<li>让UITableViewCell的分隔线宽度等于屏幕的宽度<blockquote>
+<p>3种方法：</p>
+</blockquote>
+</li>
+</ul>
+<ul>
+<li><p>[ ]  <strong>自定义cell</strong>：</p>
+<ol>
+<li>取消系统的分隔线</li>
+<li>添加一个高度为1，宽度为屏幕宽度的UIView作为cell的子视图，通过设置frame或者约束使这个UIView始终在cell的底部</li>
+<li>设置UIView的背景色，这样看起来就是cell的分隔线等于屏幕的宽度。</li>
+</ol>
+</li>
+<li><p>[ ]  <strong>通过设置系统的属性也能达到这个目的：（iOS8.0+）</strong></p>
+<p>  <code>设置tableView的separatorInset和cell的layoutMargins:</code><br>  <code>self.tableView.separatorInset = UIEdgeInsetsZero;</code><br>  <code>cell.layoutMargins = UIEdgeInsetsZero;</code></p>
+</li>
+<li><p>[ ]  <strong>重写cell的setFrame方法（万能）</strong>：</p>
+</li>
+</ul>
+<ol>
+<li>取消系统的分隔线</li>
+<li>重写cell的setFrame方法，减小cell的高度：<br><code>- (void)setFrame:(CGRect)frame {</code><pre><code>`frame.size.height -= 5;`       //  height减小的值就是分隔线的高度
+`[super setFrame:frame];`
+</code></pre><code>}</code><br>3）、设置tableView的背景色就是分隔线的颜色</li>
+</ol>
+
+        </div>
+        <div class="post-reply">
+            
+                <!-- 来必力City版安装代码 -->
+                <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTE4Ni81NzUz">
+                    <script type="text/javascript">
+                        (function(d, s) {
+                            var j, e = d.getElementsByTagName(s)[0];
+
+                            if (typeof LivereTower === 'function') { return; }
+
+                            j = d.createElement(s);
+                            j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                            j.async = true;
+
+                            e.parentNode.insertBefore(j, e);
+                        })(document, 'script');
+                    </script>
+                    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+                </div>
+                <!-- City版安装代码已完成 -->
+            
+            
+        </div>
+    </div>
+</section>
+<script>
+    // 获取第一张图, 用以当封面背景图
+    var img = document.querySelectorAll('img')[1]
+
+    if (img) {
+        var header_box = document.querySelector('#header_box')
+        header_box.style.backgroundImage = 'url('+ img.src +')'
+    }
+</script>
+      </div>
+  </div>
+  <style>
+  #footer {
+    min-height: 10vh;
+    background: black;
+    color: #fff;
+  }
+
+  #footer a {
+    color: #e1e1e1;
+  }
+</style>
+<footer id="footer" class="has-text-centered is-flex center">
+  <div class="container has-padding">
+    <div>
+      <div>
+        <!--请您保留作者署名, 主题制作来之不易-->
+        Theme by <a href="http://haojen.github.io/">Haojen Ma</a>
+        <br>
+        Copyright © ivarspy 2017
+        <br>
+        Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/search_core.js"></script>
+<script src="/js/script.js"></script>
+
+</body>
+</html>
