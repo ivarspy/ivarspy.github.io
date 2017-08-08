@@ -36,7 +36,7 @@
     <meta name="theme-color" content="#0097A7">
     <meta name="author" content="ivarspy">
     <meta name="description" itemprop="description" content="">
-    <meta name="keywords" content="">
+    <meta name="keywords" content=",iOS-tableView">
 
     <!-- Site Verification -->
     
@@ -68,11 +68,11 @@
     <meta property="og:title" content="tableView的性能优化 | ivarspy">
     <meta property="og:image" content="/img/favicon.png" />
     <meta property="og:description" content="">
-    
+    <meta property="og:article:tag" content="iOS-tableView"> 
 
     
         <meta property="article:published_time" content="Sun Aug 06 2017 22:04:49 GMT+0800" />
-        <meta property="article:modified_time" content="Sun Aug 06 2017 22:05:37 GMT+0800" />
+        <meta property="article:modified_time" content="Tue Aug 08 2017 14:50:38 GMT+0800" />
     
 
     <!-- The Twitter Card protocol -->
@@ -113,7 +113,7 @@
     "headline": "tableView的性能优化",
     "url": "http://yoursite.com/2017/08/06/tableView的性能优化/index.html",
     "datePublished": "Sun Aug 06 2017 22:04:49 GMT+0800",
-    "dateModified": "Sun Aug 06 2017 22:05:37 GMT+0800",
+    "dateModified": "Tue Aug 08 2017 14:50:38 GMT+0800",
     "description": "",
     "mainEntityOfPage": {
         "@type": "WebPage",
@@ -411,7 +411,7 @@
     </button>
     <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
         <li class="mdl-menu__item">
-        
+        <a class="post_tag-link" href="/tags/iOS-tableView/">iOS-tableView</a>
     </ul>
     
 
@@ -501,24 +501,22 @@
 </ul>
 <ul>
 <li><p>[ ]  <strong>自定义cell</strong>：</p>
-<ol>
+<ul>
 <li>取消系统的分隔线</li>
 <li>添加一个高度为1，宽度为屏幕宽度的UIView作为cell的子视图，通过设置frame或者约束使这个UIView始终在cell的底部</li>
 <li>设置UIView的背景色，这样看起来就是cell的分隔线等于屏幕的宽度。</li>
-</ol>
+</ul>
 </li>
 <li><p>[ ]  <strong>通过设置系统的属性也能达到这个目的：（iOS8.0+）</strong></p>
 <p>  <code>设置tableView的separatorInset和cell的layoutMargins:</code><br>  <code>self.tableView.separatorInset = UIEdgeInsetsZero;</code><br>  <code>cell.layoutMargins = UIEdgeInsetsZero;</code></p>
 </li>
 <li><p>[ ]  <strong>重写cell的setFrame方法（万能）</strong>：</p>
 </li>
-</ul>
-<ol>
 <li>取消系统的分隔线</li>
-<li>重写cell的setFrame方法，减小cell的高度：<br><code>- (void)setFrame:(CGRect)frame {</code><pre><code>`frame.size.height -= 5;`       //  height减小的值就是分隔线的高度
-`[super setFrame:frame];`
+<li>重写cell的setFrame方法，减小cell的高度：<br><code>- (void)setFrame:(CGRect)frame {</code><pre><code>frame.size.height -= 5;     //  height减小的值就是分隔线的高度
+[super setFrame:frame];
 </code></pre><code>}</code><br>3）、设置tableView的背景色就是分隔线的颜色</li>
-</ol>
+</ul>
 
     
 
@@ -537,6 +535,14 @@
             <!-- Post Prev & Next Nav -->
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
+    
+        <a href="/2017/08/08/一些冷门的方法/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
     
 
     <!-- Section Spacer -->
@@ -636,7 +642,7 @@
             </a>
             <ul class="dropdown-menu">
             <li>
-                <a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">2</span></a>
+                <a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">3</span></a>
             </ul>
         </li>
         
